@@ -8,6 +8,7 @@ import { Home, HowItWorks, WhoItsFor, Sample, FAQ, About, Contact, Checklist, Le
 import { AuditPage, ProofPackPage, BidDeskPage, StartPage } from "./pages/Products";
 import { Login, Signup, PaymentSuccess, PaymentCancel, ClientPortal, ClientOrderDetail } from "./pages/Portal";
 import { AdminPortal, AdminOrderDetail } from "./pages/Admin";
+import { AdminProofPages, AdminProofPageEdit } from "./pages/AdminProof";
 import PublicProof from "./pages/Public";
 
 function App() {
@@ -40,6 +41,8 @@ function App() {
             <Route path="/app/order/:id" element={<ClientOrderDetail />} />
             <Route path="/admin" element={<AdminPortal />} />
             <Route path="/admin/order/:id" element={<AdminOrderDetail />} />
+            <Route path="/admin/proof-pages" element={<AdminProofPages />} />
+            <Route path="/admin/proof-pages/:slug" element={<AdminProofPageEdit />} />
             <Route path="/p/:slug" element={<PublicProof />} />
             <Route path="*" element={<div className="section container-doc"><h1 className="text-3xl font-bold uppercase">404</h1><p className="mt-2">Page not found.</p></div>} />
           </Routes>

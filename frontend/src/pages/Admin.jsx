@@ -72,6 +72,7 @@ export function AdminPortal() {
       </div>
       <div className="mt-8 flex gap-3">
         <a href={`${API}/admin/leads.csv`} className="btn-outline" data-testid="export-leads">Export Leads CSV</a>
+        <Link to="/admin/proof-pages" className="btn-outline" data-testid="manage-proof-pages">Manage Proof Pages</Link>
       </div>
     </div>
   );
