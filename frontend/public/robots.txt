@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /app
+Disallow: /admin
+Disallow: /login
+Disallow: /signup
+Sitemap: https://laindustrialready.com/sitemap.xml
