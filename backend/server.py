@@ -161,8 +161,9 @@ async def ensure_catalog():
 
 app = FastAPI(title="LIR")
 api = APIRouter(prefix="/api")
+_cors = [o.strip() for o in os.environ.get('CORS_ORIGINS','*').split(',') if o.strip()]
 app.add_middleware(CORSMiddleware,
-    allow_origins=os.environ.get('CORS_ORIGINS','*').split(','),
+    allow_origins=_cors, allow_origin_regex=r"https://.*\.preview\.emergentagent\.com",
     allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
 
 def now(): return datetime.now(timezone.utc)
@@ -273,8 +274,8 @@ async def checkout(payload: CheckoutIn, request: Request):
     amount = max(50, p["price"] - credit)
     order_id = nid()
     if credit:
-        line_items = [{"price_data":{"currency":"usd","product_data":{"name": f'{p["name"]} (credit applied)'},
-            "unit_amount": amount},"quantity":1}]
+        line_items = [{"price_data":{"currency":"usd","product_data":{"name": f'{p["name"]} (audit credit applied)',
+            "tax_code":"txcd_10103001"}, "unit_amount": amount},"quantity":1}]
     else:
         line_items = [{"price": price.id, "quantity": 1}]
     kwargs = dict(
@@ -431,9 +432,9 @@ async def score_order(order_id: str, p: ScoreIn, user=Depends(require_admin)):
     pdf.ln(4); pdf.set_font("Helvetica","B",12); pdf.cell(0, 8, "Scorecard", ln=1)
     for c in CATEGORIES:
         s = p.scores.get(c, {})
-        pdf.set_font("Helvetica","B",10); pdf.cell(70, 6, CAT_LABELS[c])
-        pdf.set_font("Helvetica","",10); pdf.cell(20, 6, s.get("status","-").upper())
-        pdf.multi_cell(0, 6, s.get("comment",""))
+        pdf.set_font("Helvetica","B",10); pdf.cell(0, 6, f"{CAT_LABELS[c]} — {s.get('status','-').upper()}", ln=1)
+        pdf.set_font("Helvetica","",10); pdf.multi_cell(0, 5, s.get("comment","") or "-")
+        pdf.ln(1)
     pdf.ln(2); pdf.set_font("Helvetica","B",12); pdf.cell(0, 8, "Summary", ln=1)
     pdf.set_font("Helvetica","",10); pdf.multi_cell(0, 6, p.summary)
     pdf.ln(2); pdf.set_font("Helvetica","B",10); pdf.cell(0, 6, "Recommended next step:", ln=1)

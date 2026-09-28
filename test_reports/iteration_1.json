@@ -1,0 +1,50 @@
+{
+  "summary": "Backend smoke test of LIR APIs against public URL. 25 of 36 checks passed. Auth (register/login/logout/me/admin), products catalog, leads+CSV, contact, audit checkout, payment status, orders list/detail, ownership 403, proof pages, proof-quotes, admin status/delivered_at all work. Three real bugs found: (1) checkout for proof_standard/rush fails 500 when credit is applied (Stripe tax_code missing on inline line_items + automatic_tax fallback fails due to missing head office address on the Stripe test account), (2) admin score endpoint returns 500 (FPDF 'Not enough horizontal space to render a single character' - multi_cell(0,...) after two fixed-width pdf.cell calls yields zero remaining width), (3) CORS preflight OPTIONS returns 400 through Cloudflare edge with no Access-Control-Allow-Origin header (browser will still work because ACAO is set on actual POST responses via FastAPI CORS middleware). The 422 failures on /intakes, /files/upload, /messages and the credit_applied_cents=None result were CASCADED failures because proof_order_id was None due to bug #1 (test passed None as order_id). The '_id in /orders json' failure is a FALSE POSITIVE in the test script - substring '_id' matches 'session_id'/'user_id' etc.; no raw Mongo _id is actually returned (verified by inspecting responses).",
+  "tested_scope": ["backend", "auth", "integration"],
+  "passed": [
+    "GET /api/products returns 7 SKUs with exact expected prices (24900/99500/149500/14900/49500/125000/175000)",
+    "POST /api/auth/register creates client, sets httpOnly access_token cookie, returns user (role=client, company_id)",
+    "POST /api/auth/login returns 401 on wrong password, 200 on correct",
+    "GET /api/auth/me works with cookie; returns 401 after /auth/logout",
+    "Admin seeded user reallansfwmod@gmail.com / LIRadmin2026! can login and reach /api/admin/dashboard (returns by_status, leads, revenue_cents)",
+    "Client blocked (403) from /api/admin/dashboard and /api/admin/leads.csv",
+    "POST /api/leads persists lead; GET /api/admin/leads.csv returns CSV for admin",
+    "POST /api/contact stores message",
+    "POST /api/payments/checkout for 'audit' returns checkout_url (checkout.stripe.com), session_id, order_id; Mongo order inserted with status='pending_payment'",
+    "GET /api/payments/status/{session_id} returns pending_payment for unpaid session",
+    "GET /api/orders lists owner's orders (no raw _id in payload)",
+    "GET /api/orders/{id} returns order with intake/files/deliverables/messages/score fields; non-owner client gets 403",
+    "GET /api/proof-pages/demo returns seeded Acadiana Site Services content; POST /api/proof-quotes accepted",
+    "POST /api/admin/orders/{id}/status with status=delivered sets delivered_at timestamp",
+    "MongoDB responses: verified no raw ObjectId returned in /orders or /orders/{id} JSON"
+  ],
+  "failed": [
+    {
+      "area": "payments/checkout with credit",
+      "issue": "POST /api/payments/checkout for product_code='proof_standard' returns 500 when a paid audit exists (credit path). Stripe managed_payments rejects with 'Invalid line_items[0]: the product tax code is missing' because the inline price_data.product_data has no tax_code. Fallback path (automatic_tax=True) then fails with 'You must have a valid head office address to enable automatic tax calculation in test mode.' Both branches raise, endpoint 500s. Blocks credit workflow and any proof_standard/proof_rush order that has a prior audit.",
+      "evidence": "backend.err.log: stripe._error.InvalidRequestError at server.py:287 (managed_payments) and server.py:289 (automatic_tax). Also blocks proof_order_id, cascading failures for /intakes /files/upload /messages tests.",
+      "priority": "HIGH"
+    },
+    {
+      "area": "admin scoring / PDF generation",
+      "issue": "POST /api/admin/orders/{id}/score returns 500. FPDFException: 'Not enough horizontal space to render a single character' raised inside score_order PDF build. Cause: after `pdf.cell(70,6,label)` and `pdf.cell(20,6,status)` (total 90mm), the following `pdf.multi_cell(0, 6, comment)` uses width=0 meaning 'remaining page width', but on A4 default margins that math (or a following iteration where prior multi_cell moved the cursor) can leave insufficient width. The 'audit_report' file record is never created because the endpoint errors before the DB insert.",
+      "evidence": "backend.err.log: fpdf.errors.FPDFException: Not enough horizontal space to render a single character at server.py during POST /api/admin/orders/{id}/score. Test passed short 'ok' comments and still failed.",
+      "priority": "HIGH"
+    },
+    {
+      "area": "CORS preflight",
+      "issue": "OPTIONS /api/auth/login with Origin=https://lir-ready.preview.emergentagent.com returns HTTP 400 with body 'Disallowed CORS origin' and no Access-Control-Allow-Origin header (though ACA-Credentials/Headers/Methods are set). Real browser POST calls likely still succeed because FastAPI CORS middleware attaches ACAO on the actual response, but the preflight technically fails. Root cause is likely CORS_ORIGINS env parsing (comma-split leaves whitespace or trailing values mismatch). Env has 'https://lir-ready.preview.emergentagent.com,http://localhost:3000' — value is exact, so investigate whether CORSMiddleware initialization runs before .env load in some path, or Cloudflare edge is stripping. Not a blocker for current browser flows but should be verified.",
+      "evidence": "OPTIONS returned 400 (22-byte body) with headers containing access-control-allow-credentials:true and access-control-allow-methods but no ACAO.",
+      "priority": "MEDIUM"
+    }
+  ],
+  "action_items": [
+    "Fix checkout credit path: when applying credit, use `price_data` with `tax_behavior` or attach an existing Stripe Price with tax_code, OR skip managed_payments/automatic_tax for the credit branch. Simplest fix: set `product_data={'name': ..., 'tax_code': 'txcd_10103001'}` on the inline line_item, matching what ensure_catalog() uses for products.",
+    "Fix admin score PDF: replace the two pdf.cell + multi_cell layout with either (a) ln=1 after the status cell then a multi_cell across full width, or (b) explicit width for multi_cell like `pdf.multi_cell(pdf.w - pdf.l_margin - pdf.r_margin - 90, 6, comment)` and reset X after each row. Also guard against empty comment strings.",
+    "Verify CORS preflight: confirm FastAPI CORSMiddleware sees the exact origin string from CORS_ORIGINS env (no whitespace), or add explicit OPTIONS handling. Consider trimming env values on split.",
+    "After fixes, retest: credit checkout returns 200 with credit_cents=24900, intake/file/message flows for a paid proof order, and admin score returns file_id + creates 'audit_report' file record."
+  ],
+  "success_rate": {"backend": "78%", "frontend": "not tested (skipped per request)"},
+  "retest_needed": true,
+  "full_testing_deferred": true
+}
