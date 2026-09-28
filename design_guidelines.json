@@ -1,0 +1,117 @@
+{
+  "project_name": "Louisiana Industrial Readiness (LIR)",
+  "aesthetic_archetype": "Print-Like Heavy Industrial / Swiss Letterhead",
+  "archetype_description": "Quiet, authoritative, high-contrast print aesthetic inspired by official bid cover sheets, industrial inspection certificates, and Gulf Coast maritime manifests. Built with crisp paper textures, technical grid borders, clear document stamps, and zero fluff.",
+  "colors": {
+    "background_paper": "#F6F3EE",
+    "background_paper_alt": "#ECE7DF",
+    "background_card": "#FAF8F5",
+    "ink_black": "#111618",
+    "ink_muted": "#4A525A",
+    "ink_faint": "#78828A",
+    "border_industrial": "#D2CBBF",
+    "border_dark": "#111618",
+    "gulf_blue_accent": "#0E3A5D",
+    "steel_gray_accent": "#3A4750",
+    "status": {
+      "pass_green": "#1B6336",
+      "warning_yellow": "#B47D00",
+      "fail_red": "#B91C1C",
+      "neutral_steel": "#4B5563"
+    }
+  },
+  "typography": {
+    "ui_sans": {
+      "family": "'IBM Plex Sans', 'Geist', 'Work Sans', sans-serif",
+      "usage": "Headers, buttons, form controls, tabular labels, badges, navigational elements"
+    },
+    "report_serif": {
+      "family": "'Crimson Text', 'Merriweather', 'EB Garamond', Georgia, serif",
+      "usage": "Audit findings, executive summary copy, legal notices, sample report body"
+    },
+    "document_mono": {
+      "family": "'JetBrains Mono', 'Source Code Pro', monospace",
+      "usage": "SKU codes, document tracking IDs, bid timestamps, matrix scores, file hashes"
+    },
+    "scale_rules": {
+      "h1": "text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight uppercase font-sans text-ink-black",
+      "h2": "text-2xl sm:text-3xl font-semibold tracking-tight uppercase font-sans border-b border-industrial pb-2",
+      "h3": "text-xl sm:text-2xl font-semibold font-sans text-ink-black",
+      "h4": "text-lg font-medium font-sans text-ink-black",
+      "body": "text-base leading-relaxed text-ink-black font-sans",
+      "report_text": "text-lg leading-relaxed text-ink-black font-serif",
+      "meta_label": "text-xs uppercase tracking-widest font-mono text-ink-muted"
+    }
+  },
+  "layout_and_grid": {
+    "container": "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8",
+    "document_container": "max-w-4xl mx-auto bg-[#FAF8F5] border-2 border-[#111618] p-6 sm:p-10 shadow-[4px_4px_0px_0px_#111618]",
+    "grid_borders": "border border-industrial divide-y md:divide-y-0 md:divide-x divide-industrial",
+    "corner_radius": "rounded-none or max rounded-sm (0px to 2px). Strictly avoid large pill/curved SaaS buttons."
+  },
+  "visual_enhancers": {
+    "stamps": "Official document status badges resembling rubber stamps (e.g., 'VERIFIED QUALIFIED', 'AUDIT COMPLETE', 'BID READY')",
+    "watermarks": "Subtle 5% opacity diagonal block print 'LOUISIANA INDUSTRIAL READINESS' background mark on report previews",
+    "hairlines": "1px solid #111618 or #D2CBBF dividers separating document headers and meta tables",
+    "paper_shadow": "Hard offset 3px or 4px solid shadow (`shadow-[4px_4px_0px_0px_#111618]`), no soft gradient drop shadows"
+  },
+  "media_assets": {
+    "hero_industrial_site": "https://images.unsplash.com/photo-1768926968986-a88590ce5025?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzNTl8MHwxfHNlYXJjaHw0fHxpbmR1c3RyaWFsJTIwY29uc3RydWN0aW9uJTIwc2l0ZXxlbnwwfHx8fDE3OTA2MTIwMDZ8MA&ixlib=rb-4.1.0&q=85",
+    "shipping_port_crane": "https://images.unsplash.com/photo-1597334948330-38795f25d05d?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2Mzl8MHwxfHNlYXJjaHwxfHxzaGlwcGluZyUyMHBvcnQlMjBjcmFuZXxlbnwwfHx8fDE3OTA2MTIwMDZ8MA&ixlib=rb-4.1.0&q=85",
+    "welder_sparks": "https://images.unsplash.com/photo-1455165814004-1126a7199f9b?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1NzV8MHwxfHNlYXJjaHwzfHx3ZWxkZXIlMjB3b3JrZXJ8ZW58MHx8fHwxNzkwNjEyMDA5fDA&ixlib=rb-4.1.0&q=85",
+    "industrial_trucking": "https://images.unsplash.com/photo-1758224388809-35bb3c3f89b8?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMzN8MHwxfHNlYXJjaHwyfHxpbmR1c3RyaWFsJTIwdHJ1Y2slMjBoaWdod2F5fGVufDB8fHx8MTc5MDYxMjAwOXww&ixlib=rb-4.1.0&q=85"
+  },
+  "key_routes": [
+    "/",
+    "/audit",
+    "/proof-pack",
+    "/bid-desk",
+    "/how-it-works",
+    "/who-its-for",
+    "/sample",
+    "/faq",
+    "/about",
+    "/contact",
+    "/checklist",
+    "/start",
+    "/p/lir-ready",
+    "/privacy",
+    "/terms",
+    "/app",
+    "/app/orders",
+    "/app/order/:id",
+    "/admin",
+    "/admin/queue",
+    "/admin/scorecard/:id"
+  ],
+  "products_sku_matrix": [
+    {
+      "sku": "LIR-AUD-001",
+      "name": "48-Hour Qualification Audit",
+      "price": "$249",
+      "turnaround": "48 Hours",
+      "description": "Rigorous 10-point audit evaluating insurance, safety ratings, COI readiness, TWIC, licensing, and GC compliance."
+    },
+    {
+      "sku": "LIR-PRF-002",
+      "name": "Industrial Proof Pack",
+      "price": "$995 Standard / $1,495 Rush (24h)",
+      "turnaround": "3 Days or 24h Rush",
+      "description": "Comprehensive document compilation binder including certified company profile, safety program summary, insurance verification, and bid cover sheet."
+    },
+    {
+      "sku": "LIR-BID-003",
+      "name": "Bid Invite Response Desk",
+      "price": "Tiers: $149 Single / $495 Multi / $1,250 Priority / $1,750 Retainer",
+      "turnaround": "Same Day / On Demand",
+      "description": "Emergency bid response formatting, RFP compliance check, and rapid submittal assembly for Gulf Coast operators."
+    }
+  ],
+  "instructions_to_main_agent": [
+    "Ensure the entire app maintains a crisp print/letterhead aesthetic with paper background (#F6F3EE), deep ink text (#111618), and Gulf blue (#0E3A5D) accent.",
+    "Use 1px dark borders and sharp rectangular boxes with hard shadow (shadow-[3px_3px_0px_0px_#111618]) for cards, tables, and buttons.",
+    "Ensure every interactive element and data display includes data-testid attributes for testing.",
+    "Implement client portal (/app) and admin portal (/admin) with live interactive state (mock/real data storage) for order queue, multi-category audit scoring, PDF memo generation, and public proof toggle.",
+    "Never use soft SaaS gradients or rounded pill elements. Keep typography dense, clear, and authoritative."
+  ]
+}
