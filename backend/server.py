@@ -31,7 +31,7 @@ def jwt_secret(): return os.environ["JWT_SECRET"]
 def hash_pw(p): return bcrypt.hashpw(p.encode(), bcrypt.gensalt()).decode()
 def verify_pw(p, h):
     try: return bcrypt.checkpw(p.encode(), h.encode())
-    except: return False
+    except Exception: return False
 
 def create_token(uid, email, role):
     return jwt.encode({"sub": uid, "email": email, "role": role,
@@ -432,7 +432,7 @@ async def score_order(order_id: str, p: ScoreIn, user=Depends(require_admin)):
     pdf.ln(4); pdf.set_font("Helvetica","B",12); pdf.cell(0, 8, "Scorecard", ln=1)
     for c in CATEGORIES:
         s = p.scores.get(c, {})
-        pdf.set_font("Helvetica","B",10); pdf.cell(0, 6, f"{CAT_LABELS[c]} — {s.get('status','-').upper()}", ln=1)
+        pdf.set_font("Helvetica","B",10); pdf.cell(0, 6, f"{CAT_LABELS[c]} - {s.get('status','-').upper()}", ln=1)
         pdf.set_font("Helvetica","",10); pdf.multi_cell(0, 5, s.get("comment","") or "-")
         pdf.ln(1)
     pdf.ln(2); pdf.set_font("Helvetica","B",12); pdf.cell(0, 8, "Summary", ln=1)
