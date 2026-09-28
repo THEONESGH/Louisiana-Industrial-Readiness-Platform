@@ -1,30 +1,59 @@
-# Launch checklist — LIR
+# Launch checklist — Louisiana Industrial Readiness
 
-## 1. Deploy
-- Emergent Deploy button → publish the app. The platform swaps Stripe sandbox for your live account keys after you finish claim/KYC.
+## 1. Hosting
+Pick one:
 
-## 2. Stripe
-- Click **Claim your Stripe account** on the Payments tab in the Emergent UI. Complete KYC.
-- After KYC, publish again — the platform automatically swaps sandbox keys for your live keys.
+- **Simple VPS** (Hetzner, DigitalOcean, Linode): install Docker, clone this repo, `docker compose up --build`, put Caddy or nginx in front for HTTPS.
+- **Split deploy**: frontend on Cloudflare Pages / Netlify, backend on a small VPS or Fly.io, MongoDB on Atlas.
+- **Single box**: build the frontend, set `FRONTEND_BUILD` so FastAPI serves the SPA.
 
-## 3. Custom domain
-- In the Emergent UI, add `laindustrialready.com` and `www.laindustrialready.com` under Domains.
-- Wait for SSL to provision.
+Do not launch on a laptop.
 
-## 4. Admin
-- Admin user auto-seeds on startup from `ADMIN_EMAIL` / `ADMIN_PASSWORD` in backend env.
-- If the platform generated new keys or you rotated the password, restart the backend and re-log in.
+## 2. Environment
+Required before real customers:
 
-## 5. Test each product end-to-end (test mode, before switching to live)
+- [ ] `JWT_SECRET` — long random string
+- [ ] `ADMIN_EMAIL` / `ADMIN_PASSWORD` — only you know these
+- [ ] `OWNER_EMAIL` — where paid-order and contact alerts go
+- [ ] `FRONTEND_URL` — public site URL
+- [ ] `CORS_ORIGINS` — exact public origins, comma-separated
+- [ ] `COOKIE_SECURE=true` on HTTPS
+- [ ] `MONGO_URL` pointing at a durable database with backups
+
+## 3. Stripe
+- [ ] Create account in the operating LLC name
+- [ ] Complete KYC
+- [ ] Test mode first: `sk_test_...`
+- [ ] Webhook: `https://YOURDOMAIN/api/stripe/webhook`
+  - `checkout.session.completed`
+  - `charge.refunded`
+- [ ] Paste `STRIPE_WEBHOOK_SECRET`
+- [ ] Place one test $249 order end-to-end
+- [ ] Flip to `sk_live_...` only after the test order worked
+
+If Stripe keys are empty the app still runs in demo mode (orders mark paid immediately). That is for rehearsal, not customers.
+
+## 4. Email
+- [ ] Resend account
+- [ ] Verify `laindustrialready.com` (or your domain)
+- [ ] `RESEND_API_KEY` + `EMAIL_FROM`
+- [ ] Send checklist, contact, and “order paid” to yourself
+
+## 5. Domain
+- [ ] `laindustrialready.com` and `www` → your host
+- [ ] SSL
+- [ ] Update `sitemap.xml` if the domain is not that one
+
+## 6. End-to-end test (test mode)
 - [ ] Register a client → checkout audit → complete intake → upload one file
-- [ ] Admin scores the audit → PDF generates → status: delivered → client sees the PDF in `/app`
-- [ ] Same client → checkout `proof_standard` → confirm $249 credit shows on the checkout summary
-- [ ] Checkout `triage` from Bid Desk → complete intake with a URL + estimating acknowledgement
+- [ ] Admin scores the audit → PDF generates → status **delivered** → client sees the PDF in `/app`
+- [ ] Same client → checkout `proof_standard` → $249 credit shows
+- [ ] Checkout `triage` → intake with URL + estimating acknowledgement
 - [ ] Public `/p/demo` renders and quote form emails you
 - [ ] Contact form emails you
-- [ ] Checklist download emails you + subscriber
+- [ ] Checklist download emails you + the subscriber
 
-## 6. Soft launch
-- Send the "cold email" template (see OUTREACH.md) to 20 Louisiana contractors you already know.
-- Post the Facebook comment template in one relevant thread. Do not spam.
-- Watch `/admin` for the first paid order. Turn it around fast.
+## 7. Soft launch
+- Send the cold email in `OUTREACH.md` to 20 Louisiana contractors you already know
+- One Facebook / group comment. Do not spam
+- Watch `/admin`. Turn the first paid order around fast
